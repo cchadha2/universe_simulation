@@ -2,6 +2,8 @@
 
 A procedurally generated universe simulation with interactive GUI, featuring stars, planets, and other celestial objects with realistic gravitational physics.
 
+https://github.com/user-attachments/assets/f35ad07c-166d-433e-ba84-ee07f995e215
+
 ## Features
 
 - **Procedural Generation**: Randomly generates stars, planets, asteroids, and other celestial objects
