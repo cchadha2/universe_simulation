@@ -1,27 +1,32 @@
 import random
 import math
-from typing import List, Tuple
+from typing import Tuple
 from objects import Star, Planet, Asteroid, Nebula, BlackHole
 from physics import PhysicsEngine
-from utils import calculate_distance, random_position, random_velocity
+from utils import calculate_distance
 
 class Universe:
     """Represents the entire universe with all celestial objects."""
 
-    TIME_STEP = 5
-    # Tunes the relative amount of objects in the universe.
-    UNIVERSE_SIZE = 3000
-   
+    TIME_STEP = 1000
+    TIME_STEP_INCREMENT = 500
+    UNIVERSE_STARTING_LIMIT = 10e7
+
+    MIN_NUMBER_OF_BODIES = 200
+    MAX_NUMBER_OF_BODIES = 600
+    
     def __init__(self):
         self.objects: dict = {}
         self.physics_engine = PhysicsEngine()
         self.time = 0
         self.generation_seed = random.randint(1, 1000000)
-        self.max_star_count = self.UNIVERSE_SIZE // 100
-        self.max_planet_count = self.UNIVERSE_SIZE // 10
-        self.max_asteroid_count = self.UNIVERSE_SIZE // 5
-        self.max_nebula_count = self.UNIVERSE_SIZE // 1000
-        self.max_black_hole_count = self.UNIVERSE_SIZE // 1000
+
+        number_of_bodies = random.randint(self.MIN_NUMBER_OF_BODIES, self.MAX_NUMBER_OF_BODIES)
+        self.max_star_count = int(number_of_bodies * 0.3)
+        self.max_planet_count = int(number_of_bodies * 0.09)
+        self.max_asteroid_count = int(number_of_bodies * 0.5)
+        self.max_nebula_count = int(number_of_bodies * 0.1)
+        self.max_black_hole_count = 1
         self.time_step = self.TIME_STEP
         
     def generate_universe(self):
@@ -53,8 +58,8 @@ class Universe:
         """Generate stars throughout the universe."""
         for i in range(random.randint(1, self.max_star_count)):
             name = f"Star-{i+1:03d}"
-            position = random_position()
-            velocity = random_velocity()
+            position = self._random_position()
+            velocity = self._random_velocity()
             
             star = Star(name, position, velocity)
             self.objects[star.name] = star
@@ -88,8 +93,8 @@ class Universe:
                 planet = Planet(name, position, velocity, parent_star)
             else:
                 # Free-floating planet
-                position = random_position()
-                velocity = random_velocity()
+                position = self._random_position()
+                velocity = self._random_velocity()
                 planet = Planet(name, position, velocity)
             
             self.objects[planet.name] = planet
@@ -98,28 +103,28 @@ class Universe:
         """Generate asteroids throughout the universe."""
         for i in range(random.randint(1, self.max_asteroid_count)):
             name = f"Asteroid-{i+1:03d}"
-            position = random_position()
-            velocity = random_velocity()
+            position = self._random_position()
+            velocity = self._random_velocity()
             
             asteroid = Asteroid(name, position, velocity)
             self.objects[asteroid.name] = asteroid
 
     def _generate_nebulae(self):
         """Generate nebulae in the universe."""
-        for i in range(self.max_nebula_count):
+        for i in range(random.randint(1, self.max_nebula_count)):
             name = f"Nebula-{i+1:02d}"
-            position = random_position()
-            velocity = random_velocity()
+            position = self._random_position()
+            velocity = self._random_velocity()
             
             nebula = Nebula(name, position, velocity)
             self.objects[nebula.name] = nebula
     
     def _generate_black_holes(self):
         """Generate a few black holes."""
-        black_hole_count = random.randint(1, self.max_black_hole_count)
+        black_hole_count = random.randint(0, self.max_black_hole_count)
         for i in range(black_hole_count):
             name = f"BlackHole-{i+1:02d}"
-            position = random_position()
+            position = self._random_position()
             velocity = (0, 0)
             
             black_hole = BlackHole(name, position, velocity)
@@ -136,6 +141,22 @@ class Universe:
                 
                 # Set up stable orbit
                 self.physics_engine.create_stable_orbit(planet.parent_star, planet, distance)
+    
+    def _random_position(self) -> Tuple[float, float]:
+        """Generate a random position within the universe bounds."""
+        return (
+            random.uniform(-self.UNIVERSE_STARTING_LIMIT, self.UNIVERSE_STARTING_LIMIT),
+            random.uniform(-self.UNIVERSE_STARTING_LIMIT, self.UNIVERSE_STARTING_LIMIT)
+        )
+
+    def _random_velocity(self) -> Tuple[float, float]:
+        """Generate a random velocity vector."""
+        speed = random.uniform(0, 100)
+        angle = random.uniform(0, 2 * math.pi)
+        return (
+            speed * math.cos(angle),
+            speed * math.sin(angle)
+        )
     
     def update(self):
         """Update the universe for one time step."""
@@ -162,10 +183,10 @@ class Universe:
         self.time += self.time_step
 
     def increase_time_step(self):
-        self.time_step += 5
+        self.time_step += self.TIME_STEP_INCREMENT
 
     def decrease_time_step(self):
-        self.time_step -= 5
+        self.time_step -= self.TIME_STEP_INCREMENT
     
     def get_nearest_object(self, position: Tuple[float, float]) -> Tuple:
         """Get the nearest object to a position."""

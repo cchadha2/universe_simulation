@@ -6,7 +6,6 @@ A procedurally generated universe simulation with interactive GUI,
 featuring stars, planets, and other celestial objects with realistic gravitational physics.
 """
 
-import time
 from universe import Universe
 from gui import GUI
 

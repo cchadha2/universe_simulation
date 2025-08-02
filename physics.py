@@ -1,6 +1,6 @@
 import logging
 import math
-from typing import List, Tuple
+from typing import List 
 from utils import calculate_distance
 from objects import CelestialObject
 

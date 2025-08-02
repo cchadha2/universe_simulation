@@ -5,8 +5,12 @@ from utils import COLORS, world_to_screen, screen_to_world, draw_text, clamp
 
 class GUI:
     """Graphical user interface for the universe simulation."""
+
+    DEFAULT_ZOOM = 1e-5
+    MIN_ZOOM = 1e-7
+    MAX_ZOOM = 1e2
     
-    def __init__(self, screen_size: Tuple[int, int] = (1200, 800)):
+    def __init__(self, screen_size: Tuple[int, int] = (1800, 1024)):
         pygame.init()
         self.screen_size = screen_size
         self.screen = pygame.display.set_mode(screen_size)
@@ -14,9 +18,9 @@ class GUI:
         
         # Camera settings
         self.camera_pos = [0.0, 0.0]
-        self.zoom = 0.1  # Start with a good zoom level to see objects
-        self.min_zoom = 0.05
-        self.max_zoom = 10  # Limit max zoom to prevent objects going off-screen
+        self.zoom = self.DEFAULT_ZOOM
+        self.min_zoom = self.MIN_ZOOM
+        self.max_zoom = self.MAX_ZOOM 
         
         # UI settings
         self.font_small = pygame.font.Font(None, 24)
@@ -118,7 +122,7 @@ class GUI:
     def reset_view(self):
         """Reset camera to default view."""
         self.camera_pos = [0.0, 0.0]
-        self.zoom = 0.05
+        self.zoom = self.DEFAULT_ZOOM
     
     def zoom_in(self, center_pos: Tuple[int, int]):
         """Zoom in towards the mouse position."""
@@ -126,7 +130,6 @@ class GUI:
         self.zoom = clamp(self.zoom * 1.2, self.min_zoom, self.max_zoom)
         
         # Adjust camera to keep zoom centered on mouse
-        zoom_factor = self.zoom / old_zoom
         world_center = screen_to_world(center_pos, self.camera_pos, old_zoom, self.screen_size)
         new_world_center = screen_to_world(center_pos, self.camera_pos, self.zoom, self.screen_size)
         
@@ -218,7 +221,7 @@ class GUI:
         draw_text(self.screen, camera_text, self.font_small, COLORS['text'], (10, y_offset))
         y_offset += 25
         
-        zoom_text = f"Zoom: {self.zoom:.2f}x"
+        zoom_text = f"Zoom: {self.zoom:.7f}x"
         draw_text(self.screen, zoom_text, self.font_small, COLORS['text'], (10, y_offset))
         y_offset += 25
         
@@ -240,6 +243,8 @@ class GUI:
             "G: Toggle Grid",
             "T: Toggle Trails",
             "I: Toggle Object Stats",
+            "1: Decrease Time Step",
+            "2: Increase Time Step",
             "ESC: Quit"
         ]
         

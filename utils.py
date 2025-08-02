@@ -1,10 +1,6 @@
-import random
 import math
-from typing import Tuple, List
 import pygame
-
-# Universe parameters
-UNIVERSE_SIZE = 10000  # Size of the universe in scaled units
+from typing import Tuple, List
 
 # Color definitions
 COLORS = {
@@ -17,22 +13,6 @@ COLORS = {
     'grid': (50, 50, 50),       # Dark gray
     'text': (255, 255, 255),    # White
 }
-
-def random_position() -> Tuple[float, float]:
-    """Generate a random position within the universe bounds."""
-    return (
-        random.uniform(-UNIVERSE_SIZE/2, UNIVERSE_SIZE/2),
-        random.uniform(-UNIVERSE_SIZE/2, UNIVERSE_SIZE/2)
-    )
-
-def random_velocity() -> Tuple[float, float]:
-    """Generate a random velocity vector."""
-    speed = random.uniform(0, 1)  # Very low speed for stability
-    angle = random.uniform(0, 2 * math.pi)
-    return (
-        speed * math.cos(angle),
-        speed * math.sin(angle)
-    )
 
 def calculate_distance(pos1: Tuple[float, float], pos2: Tuple[float, float]) -> float:
     """Calculate the distance between two positions."""
